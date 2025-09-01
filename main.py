@@ -1,6 +1,9 @@
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI, Path, Query, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from movie import Movie 
+from user_jwt import create_token,validate_token
+from user import User
+from bearer_jwt import BearerJWT
 
 
 app = FastAPI(
@@ -45,10 +48,20 @@ def read_root():
     return HTMLResponse("<h2>Hola mundo!</h2>")
 
 
+# Login
+@app.post("/login", tags=["Endpoint Login User"])
+def login(user:User):
+    if user.email ==  "ya@123"  and user.password == "1234":
+        token : str = create_token(user.model_dump())
+        print(token)
+        return JSONResponse(content={"message": "User Loged", "token":token})
+    else: return JSONResponse(content={"message": "Not Authenticed"})
+
+
 # Obtener todas las movies
-@app.get("/movies/", tags=["Endpoints Movies"])
+@app.get("/movies/", tags=["Endpoints Movies"],dependencies=[Depends(BearerJWT())])
 def get_movies():
-    return JSONResponse(content=movies)
+    return JSONResponse(content={"movies":movies})
 
 
 # Obtener movie por id. Enviado por param

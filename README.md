@@ -31,7 +31,7 @@ Permite **listar, crear, actualizar y eliminar** registros de películas, con va
 
 4. **Instalar dependencias**
     ```bash
-    pip install fastapi uvicorn
+    pip install fastapi uvicorn PyJWT
 
 5. **Iniciar el servidor por un puerto en especifico**
     ```bash
