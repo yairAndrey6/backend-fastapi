@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Body, Path, Query
-from fastapi.responses import HTMLResponse
-from movie import Movie
+from fastapi.responses import HTMLResponse, JSONResponse
+from movie import Movie 
 
 
 app = FastAPI(
@@ -48,7 +48,7 @@ def read_root():
 # Obtener todas las movies
 @app.get("/movies/", tags=["Endpoints Movies"])
 def get_movies():
-    return movies
+    return JSONResponse(content=movies)
 
 
 # Obtener movie por id. Enviado por param
@@ -80,12 +80,12 @@ def get_movie_by_category(category:str = Query(min_length=5,max_length=80)):
 
 
 # Agregar una película 
-@app.post("/movies/add_movie/", tags=["Endpoints Movies"])
+@app.post("/movies/add_movie/", tags=["Endpoints Movies"],status_code=201)
 def create_movie(movie:Movie): 
     try:
         movies.append(movie)
         print(movies)
-        return "Movie added" 
+        return JSONResponse(content={"message": "Movie Added", "movie":[movie.dict() for m in movies]}) 
     except Exception as e:print("Error ", e)
 
 
@@ -101,15 +101,14 @@ def update_movie(id:int, movie:Movie):
                 item["titulo"] = movie.titulo
                 item["ranking"] = movie.ranking
                 item["categoria"] = movie.categoria
-        print(movies)
-        return "Movie Updated"
+                return JSONResponse(content={"message": "Movie Updated"})
     except Exception as e: print("Error: ", e)
 
 # Eliminar movie por id
-@app.delete("/movies/delete_by_id/{id}", tags=["Endpoints Movies"])
+@app.delete("/movies/delete_by_id/{id}", tags=["Endpoints Movies"],status_code=200)
 def delete_movie(id:int):
     for item in movies:
         if item["id"] == id:
             movies.remove(item)
             print(movies)
-            return "Movie Deleted"
+            return JSONResponse(content={"message": "Movie Deleted"})
